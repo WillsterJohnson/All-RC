@@ -229,5 +229,5 @@ function getMyToolsConfig() {
 ```
 
 All-RC advises that tool authors use their tool's NPM package name as the key in `.allrc`.
-While it may become possible via a quirk of All-RC's implementation to use a different key, All-RC
-reserves the right to break compatibility with tools which don't adhere to this standard.
+While it may be possible to use a different key, All-RC reserves the right to break compatibility
+with tools which don't adhere to this standard at any time (even in a patch).
