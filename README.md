@@ -84,7 +84,10 @@ configuration options should be handed to which tools.
 For some popular tools which haven't implemented All-RC support, the `allrc` CLI has a hand-crafted
 compatibility layer.
 
-To see if your favorite tool has direct interoperability support, check `allrc compat list`.
+To see if your favorite tool has direct interoperability support, check `allrc direct list`.
+If a tool is supported, all you need to do is add `allrc direct` to the start of your command.
+
+`allrc direct <tool-name> [...args]`
 
 <details>
   <summary>
