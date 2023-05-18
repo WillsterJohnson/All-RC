@@ -2,34 +2,82 @@
 
 All-RC - Standardized shared configuration file for everyone
 
+## What is All-RC?
+
+The absolute simplest description of All-RC is; "why many config files when one config file good?"
+
+All-RC is a standard for shared configuration files.
+
+Instead of each tool having it's own configuration file, which can lead to a cluttered file tree
+filled with config files you're hardly ever going to touch again, All-RC not only builds the bridges
+needed for you to put all your configurations in one unified file, but supplies an effective API for
+tool authors to provide their users with builtin support for All-RC.
+
 ## Why All-RC?
 
 As web developers, we love to use every tool we can to make our lives easier and our code better.
 We use linters, formatters, build tools, extended syntaxes, and more. All of these need a
 configuration file.
 
-Let's look at a project which makes good use of some much-loved tools:
+The unfortunate problem is, this can lead to a lot of mess in our projects, as every tool has a
+different standard for not just the name of it's file, but also the format - even being different
+between the same language, such as only supporting ESM or only supporting CJS.
 
-- vite, for build & bundle
-- Svelte & SvelteKit, for UI components, routing, and SSR
-- TypeScript, for type safety
-- Prettier, for formatting
-- ESLint, for code quality
-- PostCSS, for CSS processing
+<ul>
+  <li>
+    <details>
+      <summary>
+        Let's look at a project which makes good use of some much-loved tools
+      </summary>
+      <ul>
+        <li>Vite, for build & bundle</li>
+        <li>Svelte & SvelteKit, for UI components, routing, and SSR</li>
+        <li>TypeScript, for type safety</li>
+        <li>Prettier, for formatting</li>
+        <li>ESLint, for code quality</li>
+        <li>PostCSS, for CSS pre-processing</li>
+      </ul>
+    </details>
+  </li>
+  <li>
+    <details>
+      <summary>
+        Before we've even written any code, we have 8 config files
+      </summary>
+      <ul>
+        <li>vite.config.ts</li>
+        <li>svelte.config.js</li>
+        <li>tsconfig.json</li>
+        <li>.prettierrc</li>
+        <li>.prettierignore</li>
+        <li>.eslintrc.js</li>
+        <li>.eslintignore</li>
+        <li>postcss.config.js</li>
+      </ul>
+    </details>
+  </li>
+  <li>
+    <details>
+      <summary>
+        Even factoring in the other files and folders we'll have for this project, config files account
+        for more than half of the nodes in our project root.
+      </summary>
+      <ul>
+        <li>dist</li>
+        <li>node_modules</li>
+        <li>src</li>
+        <li>package.json</li>
+        <li>README.md</li>
+        <li>.gitignore</li>
+        <li>.npmrc</li>
+      </ul>
+    </details>
+  </li>
+</ul>
 
-And let's look at the config files needed for all of this;
-
-- vite.config.ts
-- svelte.config.js
-- tsconfig.json
-- .prettierrc
-- .prettierignore
-- .eslintrc.js
-- .eslintignore
-- postcss.config.js
-
-Even factoring in the other files and folders we'll have for this project, config files account for
-more than half of the nodes in our project root.
+Now let's imagine we've got a monorepo. It has a two or three apps, a few dozen packages, and of
+course the workspace root. Depending on the tools you're using, you could be looking at anywhere
+from 50 to 150 config files.
 
 ### Enter All-RC
 
@@ -52,7 +100,7 @@ All-RC stands between our tools and their configuration files. Instead of each t
 own config file, they can ask All-RC for the config they need.
 
 For you, the developer, this means you add all your configs to an `.allrc` file, and All-RC will do
-the rest:
+the rest. One project, one config file.
 
 - JSON5: `.allrc`
 - YAML: `.allrc.yaml`
@@ -146,14 +194,23 @@ If you want to provide type definitions for you config (and it's _highly_ sugges
 make sure your package exports a type named `AllRC`.
 
 ```ts
-import { readConfig } from "@all-rc/read-config";
+import { readConfig, MissingKeyError, MissingFileError } from "@all-rc/read-config";
 
 export interface AllRC {
   /* ... */
 }
 
-function myToolsCLI() {
-  const config = readConfig<AllRC>("<your-package-name>");
+function getMyToolsConfig() {
+  try {
+    return readConfig<AllRC>("<your-package-name>");
+  } catch (e) {
+    if (e instanceof MissingFileError) {
+      // no `.allrc` file found
+    }
+    if (e instanceof MissingKeyError) {
+      // no config for your tool found
+    }
+  }
 }
 ```
 
