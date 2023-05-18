@@ -137,6 +137,8 @@ If a tool is supported, all you need to do is add `allrc direct` to the start of
 
 `allrc direct <tool-name> [...args]`
 
+For example, a CLI tool named `foo` would be run with `allrc direct foo [...args]`.
+
 <details>
   <summary>
   Tools with Direct Interoperability
@@ -161,27 +163,39 @@ The `allrc` CLI can process the configuration for a given tool, write it to a hi
 `node_modules`, and point the tool to the configuration file.
 
 To utilize general compatibility, all you need to do is add `allrc compat` to the start of your
-command, and change your `--config` argument to be `@allrc`.
+command, and change your `--config` argument to be `@allrc.`, followed by the file format of config
+to use, such as `@allrc.cjs`, or `@allrc.json`.
 
 `allrc compat <tool-name> --config=@allrc [...args]`
 
+For example, a CLI tool named `foo` which needs a `cjs` config file would be run with `allrc compat foo --config=@allrc.cjs [...args]`.
+
+This will run the tool, with all the command line arguments you've passed, and with the
+configuration you've provided in `.allrc`.
+
 > Note: `<tool-name>` here refers to the tool's CLI name. All-RC can determine the tool's NPM
 > package name and therefore it's key in `.allrc`.
-> This is different to `allrc link` (which takes the tool's NPM package name)
 
 ### Symlink Interoperability
 
-Some tools aren't popular enough for All-RC to support directly, and also don't have a command-line
-argument for a config file.
+Some tools aren't popular enough for All-RC to provide direct interoperability, and also don't have
+a command-line argument for specifying a config file.
 
 For these tools, All-RC can create a symlink to the hidden config file mentioned in
 [General Interoperability](#general-interoperability).
 
-To use this, run `allrc link <tool-name> <config-file-path>` before running your tool.
+To use this, run `allrc link <package-name> <config-file-path>` before running your tool.
 
-> Note: `<tool-name>` here refers to the key in `.allrc`, which **should** be the name of the tool's
-> NPM package. You **should not** pass in the tool's CLI name, as this could be different.
-> This is different to `allrc compat` (which _does_ take the tool's CLI name)
+`allrc link <package-name> <config-file-path> && <tool-name> [...args]`
+
+For example, a CLI tool named `foo` from the package `@example/foo` would be run with
+`allrc link @example/foo ./foo.config.json && foo [...args]`.
+
+This will parse the tool's config from your `.allrc`, write it to a hidden folder in `node_modules`,
+and create a symlink to it at the path you've provided.
+
+> Note: `<package-name>` here refers to the key in `.allrc`, which **should** be the name of the
+> tool's NPM package. You **should not** pass in the tool's CLI name, as this could be different.
 
 ## Supporting All-RC in Your Tool
 
